@@ -15,14 +15,12 @@ class FamilyStructure:
         # example list of members
         self._members = []
 
-    # read-only: Use this method to generate random members ID's when adding members into the list
-    def _generateId(self):
-        return randint(0, 99999999)
+    
 
     def add_member(self, member):
         # fill this method and update the return
         if "id" not in member:
-            member["id"]= self._generateId()
+            raise Exception("ID is required for adding a member")
 
         member['last_name'] = self.last_name
         self._members.append(member)
