@@ -14,10 +14,10 @@ CORS(app)
 
 # create the jackson family object
 jackson_family = FamilyStructure("Jackson")
-jackson_family.add_member({'first_name': "John", "age": 33, "lucky_numbers": [7, 13, 22]})
+
 jackson_family.add_member({'first_name': "Jane", "age": 35, "lucky_numbers": [10, 14, 3]})
 jackson_family.add_member({'first_name': "Jimmy", "age": 5, "lucky_numbers": [1]})
-
+jackson_family.add_member({'first_name': "Tommy", "age": 33, "lucky_numbers": [7, 13, 22], "id": 3443})
 
 # Handle/serialize errors like a JSON object
 @app.errorhandler(APIException)
@@ -40,11 +40,9 @@ def add_member():
     # Extract data from request body
     request_data = request.json
 
-    # Validate request data
     if not all(key in request_data for key in ('first_name', 'age', 'lucky_numbers')):
         return jsonify({"error": "Missing required fields"}), 400
 
-    # Validate data types
     try:
         first_name = request_data['first_name']
         age = int(request_data['age'])
@@ -54,6 +52,7 @@ def add_member():
 
     # Add new member to the family data structure
     new_member = {
+        'id': jackson_family._generateId(),
         'first_name': first_name,
         'age': age,
         'lucky_numbers': lucky_numbers
@@ -61,12 +60,12 @@ def add_member():
     jackson_family.add_member(new_member)
 
     # Return success response
-    return jsonify({"message": "New member added successfully"}), 200
+    return jsonify({"message": "New member added successfully", 'id': new_member['id']}), 200
 
-@app.route('/member/<int:member_id>', methods=['GET'])
-def get_member(member_id):
+@app.route('/member/<int:id>', methods=['GET'])
+def get_member(id):
     # Retrieve the member from the family data structure
-    member = jackson_family.get_member(member_id)
+    member = jackson_family.get_member(id)
 
     # Check if the member exists
     if member is None:
@@ -74,8 +73,8 @@ def get_member(member_id):
 
     # Construct the response dictionary
     response = {
-        "id": member_id,
-        "name": member["first_name"],
+        "id": id,
+        "first_name": member["first_name"],
         "age": member["age"],
         "lucky_numbers": member["lucky_numbers"]
     }
@@ -83,10 +82,10 @@ def get_member(member_id):
     # Return the member's information
     return jsonify(response), 200
 
-@app.route('/member/<int:member_id>', methods=['DELETE'])
-def delete_member(member_id):
+@app.route('/member/<int:id>', methods=['DELETE'])
+def delete_member(id):
     # Delete the member from the family data structure
-    success = jackson_family.delete_member(member_id)
+    success = jackson_family.delete_member(id)
 
     # Check if the deletion was successful
     if not success:

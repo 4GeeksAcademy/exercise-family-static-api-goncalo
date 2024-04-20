@@ -29,18 +29,11 @@ class FamilyStructure:
         return member
 
     def delete_member(self, id):
-        # fill this method and update the return
-        index_to_delete = None
         for index, member in enumerate(self._members):
             if member['id'] == id:
-                index_to_delete = index
-                break
-        
-        if index_to_delete is not None:
-            del self._members[index_to_delete]
-            return True
-        else:
-            return False
+                del self._members[index]
+                return {"done": True}
+        return {"done": False}
 
     def get_member(self, id):
         # fill this method and update the return
